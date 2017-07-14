@@ -23,7 +23,21 @@ def compute_p_value(deviation):
             infSum += math.exp(-(2*i-1)**2*math.pi**2/(8*deviation**2))
         return 1-math.sqrt(2*math.pi)/deviation*infSum
 
+#This function calculates the overall CDF when you give it a bunch of cdfs.
+#It assumes the functions are normalized. It is a combined cdf representing the cdf of the entire population.
+def CDF(x):
+    value = 0
+    for func in p:
+        value += func(x)
+    return value/n
 
+#This is the global variable representing the overall CDF that is used in the main function to calculate the distance between the current
+#CDF and the overall CDF.
+discreteCDF = np.zeros((numJumps,))
+for i in range(numJumps):
+    discreteCDF[i] = CDF(i*jumpSize+domain[0])
+    
+    
 """
 Main function:
 This is extremely good for large data sets because it can run fast, and will produce results that are far better than a
