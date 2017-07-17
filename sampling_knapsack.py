@@ -48,20 +48,25 @@ To adjust the parameters, it's better to have a large significance level as then
 more quickly.
 
 Inputs:
-w is a vector of the weights for each of the pdfs. Normally this would correspond to the number of objects that constitute this pdf.
-n is the number of pdfs
-p is a vector of pdfs
+w is a vector of the weights for each of the cdfs. Normally this would correspond to the number of objects that constitute this cdf.
+n is the number of cdfs
+p is a vector of cdf: this is currently written for them to be functions, but it can easily be modified so that it corresponds to the
+value of the cdf at discrete intervals or the sample elements (using the scipy kstest implementation)
 maxWeight is the maximum weight that you can have in your sample.
 
-"""
-sampleProportion = 0.5
-significanceLevel = 0.9999
+Note that each object we are considering right now is a collection of elements rather than a single element. They don't have to be grouped
+intelligently, although groupings that create a larger variety of cdfs tend to work better.
 
-def really_fast_knapsack(w, n, p, maxWeight):
+"""
+sampleProportion = 0.5 #Customize this to choose the size of the random sample that we add onto
+significanceLevel = 0.9999 #Customize this to choose how much each object must improve our sample by in order to be added.
+
+def choose_sample(w, n, p, maxWeight):
     totalWeight = 0
     currentCDF = np.zeros((numJumps,))
     contents = dict()
-    #first, we take a simple random sample that has weight at most maxWeight/2. It should be similar to the population density.
+    #first, we take a simple random sample that has weight at most maxWeight*sampleProportion. It should be somewhat similar to the
+    #population density. We will then build on this to improve the sample for our final distribution.
     while True:
         i = np.random.randint(0,n)
         if i not in contents:
@@ -72,16 +77,9 @@ def really_fast_knapsack(w, n, p, maxWeight):
                 totalWeight += w[i]
                 for j in range(numJumps):
                     currentCDF[j] += w[i]*(p[i](jumpSize*j+domain[0]))
-    #Now, we add objects to this sample to try to correct it and make it closer to the population density (uniform)
-    
-    #List of possible approaches:
-    
-    #naively add 1 object at a time, fastest
-    #greedy pairing algorithm on the leftover objects, probably better accuracy (still ends up worse than prior pairing alg)
-    #some kind of DP algorithm, needs to be much better than what I used earlier to have any merits
-    
-    
-    #This is the approach that adds 1 object at a time. This time, we just take anything that's better.
+    #Now, we add objects to this sample to try to correct it and make it closer to the population density
+    #Here, we add 1 object at a time. This time, we just take anything that decreases the deviation by a significant amount, defined by
+    #significanceLevel. This causes the algorithm to go much faster than anything that does a lot of comparisons.
     currentDeviation = closeness(currentCDF, discreteCDF)
     pairAdded = True
     numIts=0
