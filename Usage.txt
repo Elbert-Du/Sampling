@@ -1,0 +1,7 @@
+There are a couple things you need to be careful about when using the code here.
+
+1. Global variables. Because it's inefficient and annoying to have to read in ~10 variables every time you call a function, a lot of values are stored as global variables. Make sure to take note of what is defined outside of the functions as a global variable and how they are defined as if you want to use this code, you will have to define those global variables. Furthermore, setting the values of some of the global variables is very important: numBins/numJumps determines how precisely your sample will represent the actual data and sampleProportion/significanceLevel will determine how well the function performs when choosing a sample.
+
+2. Converting your data to a usable format. In the multidimensional case, the notebook demonstrates how to convert a sample into usable format by grouping and binning. In the one-dimensional case, it reads in functions (for increased accuracy), meaning you will have to generate a pdf for your data. The best way to do this is through kernel density estimation using a kernel with a nice mathematical formula so you can generate the pdfs quickly and easily.
+
+3. You have to do this with a large data set. The whole point of choosing a small data set is that the total amount of data you have is too large to analyze, so you need to take a smaller part of it. The assumption that there's an enormous amount of data is crucial to this algorithm giving a sample that is representative of the population.
